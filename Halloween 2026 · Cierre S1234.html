@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Halloween 2026 · Cierre de Campaña</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --naranja: #E8520A;
+  --morado:  #4A1D8C;
+  --verde:   #1A6B3C;
+  --negro:   #1A1917;
+  --gris0:   #F7F6F4;
+  --gris1:   #E8E6E3;
+  --gris2:   #C8C6C2;
+  --gris3:   #7A7874;
+  --radio:   8px;
+  --ok-bg:   #DCFCE7; --ok-txt: #15803D;
+  --warn-bg: #FEF9C3; --warn-txt: #A16207;
+  --bad-bg:  #FEE2E2; --bad-txt: #B91C1C;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: #fff;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--negro);
+  font-size: 13px;
+  padding: 1rem;
+}
+
+/* ── CHIPS LEYENDA ── */
+.leyenda-chips {
+  display: flex; gap: .5rem; flex-wrap: wrap; margin-bottom: .85rem;
+}
+.lchip {
+  display: flex; align-items: center; gap: .3rem;
+  font-size: 12px; color: var(--negro);
+}
+.lchip-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+
+/* ── NAV ── */
+.nav-tabs {
+  display: flex; gap: .4rem; flex-wrap: wrap; margin-bottom: 1.1rem;
+}
+.tab-btn {
+  padding: .35rem .85rem;
+  border-radius: 20px;
+  border: 1.5px solid var(--gris1);
+  background: #fff;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px; font-weight: 500;
+  color: var(--gris3);
+  cursor: pointer;
+  transition: all .15s;
+}
+.tab-btn:hover { border-color: var(--naranja); color: var(--naranja); }
+.tab-btn.activo { background: var(--negro); border-color: var(--negro); color: #fff; font-weight: 600; }
+
+/* ── KPI TILES ── */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: .6rem;
+  margin-bottom: 1.1rem;
+}
+@media(max-width:600px){ .kpi-grid { grid-template-columns: repeat(2,1fr); } }
+.kpi-tile {
+  border: 1px solid var(--gris1);
+  border-radius: var(--radio);
+  padding: .8rem 1rem;
+}
+.kpi-label { font-size: 11px; color: var(--gris3); margin-bottom: .25rem; }
+.kpi-val {
+  font-family: 'Sora', sans-serif;
+  font-size: 22px; font-weight: 700;
+}
+.kpi-sub { font-size: 11px; color: var(--gris3); margin-top: .15rem; }
+.kpi-ok   { color: var(--ok-txt); }
+.kpi-warn { color: var(--warn-txt); }
+.kpi-bad  { color: var(--bad-txt); }
+
+/* ── SECCIÓN TÍTULO ── */
+.sec-titulo {
+  font-size: 10px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: .08em;
+  color: var(--gris3);
+  margin-bottom: .6rem;
+}
+
+/* ── TABLA RESULTADOS ── */
+.tabla-res {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1.5rem;
+  font-size: 12px;
+}
+.tabla-res th {
+  font-size: 10px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: .06em;
+  color: var(--gris3);
+  padding: .4rem .6rem;
+  border-bottom: 1px solid var(--gris1);
+  text-align: left;
+}
+.tabla-res th:not(:first-child) { text-align: right; }
+.tabla-res td {
+  padding: .6rem .6rem;
+  border-bottom: 1px solid var(--gris0);
+  vertical-align: middle;
+}
+.tabla-res tr:last-child td { border-bottom: none; }
+.td-right { text-align: right; }
+.td-punto { font-weight: 600; font-size: 13px; }
+.td-total {
+  font-family: 'Sora', sans-serif;
+  font-size: 15px; font-weight: 700;
+  text-align: right;
+}
+.td-meta-pct { text-align: right; }
+.badge-pct {
+  display: inline-block;
+  padding: .18rem .5rem;
+  border-radius: 5px;
+  font-size: 11px; font-weight: 700;
+}
+.b-ok   { background: var(--ok-bg);   color: var(--ok-txt); }
+.b-warn { background: var(--warn-bg);  color: var(--warn-txt); }
+.b-bad  { background: var(--bad-bg);   color: var(--bad-txt); }
+
+/* mini barras productos */
+.mini-prod-row {
+  display: flex; gap: 3px; align-items: center;
+  font-size: 10px; color: var(--gris3);
+}
+.mini-prod-bar {
+  display: inline-block;
+  height: 14px; border-radius: 2px;
+  min-width: 2px;
+}
+
+/* tendencia semanal chips */
+.tend-chips { display: flex; gap: 3px; flex-wrap: nowrap; }
+.tend-chip {
+  font-family: 'Sora', sans-serif;
+  font-size: 11px; font-weight: 600;
+  padding: .15rem .4rem;
+  border-radius: 4px;
+  color: #fff;
+  white-space: nowrap;
+}
+
+/* ── GRÁFICO BARRAS ── */
+.grafico-wrap { overflow-x: auto; }
+.grafico-svg  { display: block; width: 100%; min-width: 420px; }
+
+/* ── PANEL PUNTO ── */
+.punto-header {
+  display: flex; align-items: baseline; gap: .5rem;
+  margin-bottom: .85rem;
+}
+.punto-nombre {
+  font-family: 'Sora', sans-serif;
+  font-size: 16px; font-weight: 700;
+}
+.punto-director { font-size: 12px; color: var(--gris3); }
+
+.prod-kpi-row {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: .6rem;
+  margin-bottom: 1rem;
+}
+@media(max-width:480px){ .prod-kpi-row { grid-template-columns: 1fr; } }
+
+.prod-tile {
+  border: 1px solid var(--gris1);
+  border-radius: var(--radio);
+  padding: .75rem .85rem;
+}
+.pt-prod { font-size: 10px; color: var(--gris3); text-transform: uppercase; letter-spacing: .06em; margin-bottom: .2rem; }
+.pt-val  {
+  font-family: 'Sora', sans-serif;
+  font-size: 24px; font-weight: 700;
+  line-height: 1;
+}
+.pt-sub  { font-size: 11px; color: var(--gris3); margin-top: .2rem; }
+.pt-barra { height: 4px; background: var(--gris1); border-radius: 2px; margin-top: .5rem; overflow: hidden; }
+.pt-fill  { height: 100%; border-radius: 2px; }
+
+/* mensaje director */
+.msg-box {
+  background: var(--gris0);
+  border: 1px solid var(--gris1);
+  border-radius: var(--radio);
+  padding: .85rem 1rem;
+  margin-top: 1rem;
+}
+.msg-label { font-size: 10px; text-transform: uppercase; letter-spacing: .08em; color: var(--gris3); font-weight: 600; margin-bottom: .5rem; }
+.msg-text  { font-size: 13px; line-height: 1.7; color: #2D2B28; }
+.msg-text strong { color: var(--negro); }
+.cn { color: var(--naranja); font-weight: 600; }
+.cm { color: var(--morado);  font-weight: 600; }
+.cv { color: var(--verde);   font-weight: 600; }
+
+/* nota contexto */
+.nota-box {
+  background: #FFF7ED;
+  border-left: 3px solid #F97316;
+  border-radius: 0 var(--radio) var(--radio) 0;
+  padding: .6rem .85rem;
+  font-size: 12px; color: #92400E; line-height: 1.55;
+  margin-bottom: 1rem;
+}
+
+/* ── GRAFICO DIARIO PUNTO ── */
+.grafico-diario-svg { display: block; width: 100%; min-width: 540px; }
+
+/* ── EVOLUCIÓN SEMANAL ── */
+.evol-grid {
+  display: grid; grid-template-columns: repeat(3,1fr); gap: .6rem;
+  margin-bottom: 1.2rem;
+}
+@media(max-width:520px){ .evol-grid { grid-template-columns: 1fr; } }
+.evol-card {
+  border: 1px solid var(--gris1); border-radius: var(--radio); padding: .75rem .9rem;
+}
+.evol-titulo {
+  font-size: 10px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: .06em; margin-bottom: .6rem;
+}
+.evol-semanas {
+  display: flex; gap: 4px; align-items: flex-end; height: 56px;
+  margin-bottom: .4rem;
+}
+.evol-bar-wrap {
+  display: flex; flex-direction: column; align-items: center;
+  flex: 1; height: 100%; justify-content: flex-end; gap: 2px;
+}
+.evol-bar {
+  width: 100%; border-radius: 3px 3px 0 0;
+  min-height: 2px;
+}
+.evol-val {
+  font-family: 'Sora', sans-serif; font-size: 10px; font-weight: 700;
+  line-height: 1;
+}
+.evol-label {
+  font-size: 9px; color: var(--gris3); text-align: center;
+}
+.evol-flecha {
+  display: flex; align-items: center; gap: 3px;
+  font-size: 10px; color: var(--gris3); margin-top: .3rem; flex-wrap: wrap;
+}
+.arrow-up   { color: var(--ok-txt);   font-weight: 700; }
+.arrow-down { color: var(--bad-txt);  font-weight: 700; }
+.arrow-flat { color: var(--warn-txt); font-weight: 700; }
+
+/* producto resumen cards */
+.prod-resumen-grid {
+  display: grid; grid-template-columns: repeat(3,1fr); gap: .6rem;
+  margin-bottom: 1.2rem;
+}
+@media(max-width:520px){ .prod-resumen-grid { grid-template-columns: 1fr; } }
+.prod-resumen-card {
+  border: 1px solid var(--gris1); border-radius: var(--radio); padding: .75rem .9rem;
+}
+.prc-nombre { font-size: 11px; font-weight: 600; color: var(--gris3); text-transform: uppercase; letter-spacing: .06em; margin-bottom: .35rem; }
+.prc-val { font-family: 'Sora', sans-serif; font-size: 20px; font-weight: 700; line-height: 1; }
+.prc-sub { font-size: 11px; color: var(--gris3); margin-top: .18rem; margin-bottom: .5rem; }
+.prc-barra { height: 4px; background: var(--gris1); border-radius: 2px; margin-top: .4rem; overflow: hidden; }
+.prc-fill { height: 100%; border-radius: 2px; }
+.prc-dif {
+  font-size: 12px; font-weight: 700; margin-top: .4rem;
+}
+</style>
+</head>
+<body>
+
+<!-- LEYENDA -->
+<div class="leyenda-chips">
+  <div class="lchip"><span class="lchip-dot" style="background:var(--naranja)"></span>Cajita Hechizada</div>
+  <div class="lchip"><span class="lchip-dot" style="background:var(--morado)"></span>Hechizos de Sabor (dips)</div>
+  <div class="lchip"><span class="lchip-dot" style="background:var(--verde)"></span>Postre Drácula</div>
+</div>
+
+<!-- NAV -->
+<div class="nav-tabs">
+  <button class="tab-btn activo" onclick="setTab('general',this)">Resumen general</button>
+  <button class="tab-btn" onclick="setTab('Avenida',this)">Avenida</button>
+  <button class="tab-btn" onclick="setTab('Centro',this)">Centro</button>
+  <button class="tab-btn" onclick="setTab('Principal',this)">Principal</button>
+  <button class="tab-btn" onclick="setTab('Unicentro',this)">Unicentro</button>
+  <button class="tab-btn" onclick="setTab('Domicilios',this)">Domicilios</button>
+</div>
+
+<!-- CONTENIDO -->
+<div id="contenido"></div>
+
+<script>
+// ─────────────────────────────────────────────────────────────────────────────
+// DATOS
+// ─────────────────────────────────────────────────────────────────────────────
+const CAMP_DIAS = 33;
+const SEMANAS = ['S1','S2','S3','S4'];
+const SEM_LABELS = ['S1 (7-14 oct)','S2 (15-21 oct)','S3 (22-28 oct)','S4 (29 oct-7/8 nov)'];
+
+const META = {
+  Avenida:    { c:81,  d:323, p:99  },
+  Centro:     { c:144, d:450, p:99  },
+  Principal:  { c:104, d:543, p:121 },
+  Unicentro:  { c:415, d:390, p:99  },
+  Domicilios: { c:59,  d:194, p:132 }
+};
+
+// Totales reales finales campaña completa
+const REAL = {
+  Avenida:    { c:118, d:429, p:111 },
+  Centro:     { c:177, d:477, p:115 },
+  Principal:  { c:172, d:603, p:146 },
+  Unicentro:  { c:394, d:454, p:185 },
+  Domicilios: { c:74,  d:240, p:147 }
+};
+
+// Ventas por semana [cajita, dips, postre]
+// S1: oct7-14 | S2: oct15-21 | S3: oct22-28 | S4: oct29-nov7/8
+const SERIES_SEM = {
+  Avenida:    [[23,131,26],[24,90,26],[33,101,25],[38,107,34]],
+  Centro:     [[24,163,34],[32,93,13],[28,84,24],[93,137,44]],
+  Principal:  [[46,227,37],[26,178,23],[26,103,22],[74,95,64]],
+  Unicentro:  [[79,90,42], [70,69,43],[98,124,54],[147,171,46]],
+  Domicilios: [[14,71,38], [16,69,32],[8,61,30],  [34,39,47]]
+};
+
+// Ventas diarias completas (33 días: 7 oct – 8 nov)
+const DIARIO = {
+  dias: [
+    '7-oct','8-oct','9-oct','10-oct','11-oct','12-oct','13-oct','14-oct',
+    '15-oct','16-oct','17-oct','18-oct','19-oct','20-oct','21-oct',
+    '22-oct','23-oct','24-oct','25-oct','26-oct','27-oct','28-oct',
+    '29-oct','30-oct','31-oct',
+    '1-nov','2-nov','3-nov','4-nov','5-nov','6-nov','7-nov','8-nov'
+  ],
+  festivo: [
+    false,false,false,false,false,true,false,false,
+    false,false,false,false,false,false,false,
+    false,false,false,false,false,false,false,
+    false,false,true,
+    false,false,false,false,false,false,false,false
+  ],
+  marchas: [
+    false,false,false,false,false,false,false,true,
+    false,false,false,false,false,false,false,
+    false,false,false,false,false,false,false,
+    false,false,false,
+    false,false,false,false,false,false,false,false
+  ],
+  // Separadores de semana: índices donde empieza cada semana
+  // S1: 0-7, S2: 8-14, S3: 15-21, S4: 22-32
+  Avenida: {
+    c:[2,1,7,5,5,1,2,0,  3,5,9,4,1,0,2,  12,3,8,2,3,3,2,  3,10,12,5,2,2,3,0,1,0,0],
+    d:[14,8,28,18,20,14,17,12, 10,7,17,22,7,9,14, 13,13,26,10,12,17,10, 13,14,25,12,4,6,11,9,8,5,0],
+    p:[4,1,2,7,3,5,1,3,  3,2,0,13,1,3,4,  2,3,3,5,3,1,8,  5,1,2,1,2,3,2,0,2,16,0]
+  },
+  Centro: {
+    c:[2,2,2,5,8,1,2,2,  2,8,8,7,1,3,3,  3,1,13,4,1,2,4,  5,7,51,2,4,6,3,1,4,10,0],
+    d:[15,18,28,27,27,18,20,10, 17,19,14,11,22,7,3, 8,13,20,9,10,7,17, 16,25,21,6,9,10,19,4,15,12,0],
+    p:[2,8,3,6,7,1,5,2,  0,4,1,1,7,0,0,  2,6,0,4,2,1,9,  5,0,10,1,5,2,3,1,11,6,0]
+  },
+  Principal: {
+    c:[5,8,7,7,7,4,2,6,  1,3,9,4,1,3,1,  4,3,6,0,3,10,0,  5,8,53,3,2,1,0,0,1,1,0],
+    d:[7,25,27,51,37,28,13,39, 16,21,35,24,18,20,20, 18,38,10,10,13,14,0, 3,19,36,4,11,5,6,6,5,0,0],
+    p:[1,8,4,7,9,6,0,2,  3,5,5,7,1,1,1,  5,2,1,4,7,3,0,  3,16,21,0,1,1,8,1,3,10,0]
+  },
+  Unicentro: {
+    c:[15,15,3,17,12,3,4,10, 1,18,23,11,3,9,5, 9,14,27,15,6,10,17, 11,16,56,10,12,8,1,3,16,14,0],
+    d:[18,19,5,4,12,12,9,11, 10,11,11,11,6,12,8, 9,12,25,22,11,25,20, 9,20,52,15,18,8,3,10,10,20,0],
+    p:[5,5,3,12,5,7,3,2, 11,7,6,5,5,9,0, 8,7,12,8,7,8,4, 8,7,10,14,3,2,1,3,2,4,0]
+  },
+  Domicilios: {
+    c:[0,1,1,3,5,4,0,0,  1,6,2,5,0,0,2,  0,0,1,3,2,1,1,  2,2,15,4,0,0,1,0,0,8,2],
+    d:[7,7,5,14,8,11,6,13, 11,5,13,19,6,7,8, 6,7,16,11,4,9,8, 5,5,10,8,11,0,0,0,0,0,0],
+    p:[3,3,5,4,10,8,1,4, 3,4,6,15,2,1,1, 0,1,14,3,2,5,5, 4,1,4,10,3,1,6,1,9,3,5]
+  }
+};
+
+const INFO = {
+  Avenida:    { director:'Viviana' },
+  Centro:     { director:'Jennifer' },
+  Principal:  { director:'Wilson' },
+  Unicentro:  { director:'Jaime' },
+  Domicilios: { director:'Nancy' }
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// UTILIDADES
+// ─────────────────────────────────────────────────────────────────────────────
+const PUNTOS = ['Avenida','Centro','Principal','Unicentro','Domicilios'];
+const fmt = n => Math.round(n).toLocaleString('es-CO');
+const fmtCOP = n => '$'+Math.round(n).toLocaleString('es-CO');
+const pct = (r,m) => Math.round(r/m*100);
+const pctS = (r,m) => (r/m*100).toFixed(1)+'%';
+const claseBadge = p => p>=100?'b-ok':p>=80?'b-warn':'b-bad';
+const textoEstado = p => p>=100?'✓':p>=80?'~':'✗';
+
+const COLORES_SEM = ['#2563EB','#D97706','#16A34A','#9333EA'];
+
+// ─────────────────────────────────────────────────────────────────────────────
+// EVOLUCIÓN SEMANAL POR PRODUCTO (reemplaza ritmo)
+// ─────────────────────────────────────────────────────────────────────────────
+function evolucionSemanal(punto) {
+  const prods = [
+    { key:'c', nombre:'Cajita Hechizada', color:'var(--naranja)', hex:'#E8520A' },
+    { key:'d', nombre:'Hechizos de Sabor', color:'var(--morado)', hex:'#4A1D8C' },
+    { key:'p', nombre:'Postre Drácula', color:'var(--verde)', hex:'#1A6B3C' }
+  ];
+  const idx = {c:0,d:1,p:2};
+
+  const cards = prods.map(pr => {
+    const vals = SERIES_SEM[punto].map(sem => sem[idx[pr.key]]);
+    const maxV = Math.max(...vals, 1);
+
+    // flechas de tendencia entre semanas
+    const flechas = [];
+    for (let i=1; i<vals.length; i++) {
+      const delta = vals[i] - vals[i-1];
+      const pctChg = vals[i-1]>0 ? Math.round(Math.abs(delta)/vals[i-1]*100) : 0;
+      if (delta > 0)      flechas.push(`<span class="arrow-up">↑${pctChg}%</span>`);
+      else if (delta < 0) flechas.push(`<span class="arrow-down">↓${pctChg}%</span>`);
+      else                flechas.push(`<span class="arrow-flat">→</span>`);
+    }
+
+    const barras = vals.map((v,i) => {
+      const h = Math.max(Math.round((v/maxV)*48), 2);
+      const opacity = i === vals.length-1 ? '1' : '0.55';
+      return `<div class="evol-bar-wrap">
+        <div class="evol-val" style="color:${pr.hex}">${v}</div>
+        <div class="evol-bar" style="height:${h}px;background:${pr.hex};opacity:${opacity}"></div>
+        <div class="evol-label">${SEMANAS[i]}</div>
+      </div>`;
+    }).join('');
+
+    // construir flecha intercalada con labels S1→S2→S3→S4
+    const flechaStr = flechas.map((f,i)=>`${f}`).join(' ');
+
+    return `<div class="evol-card">
+      <div class="evol-titulo" style="color:${pr.hex}">${pr.nombre}</div>
+      <div class="evol-semanas">${barras}</div>
+      <div class="evol-flecha">S1→S2 ${flechas[0]} &nbsp; S2→S3 ${flechas[1]} &nbsp; S3→S4 ${flechas[2]}</div>
+    </div>`;
+  }).join('');
+
+  return `<div class="sec-titulo">Evolución semana a semana por producto</div>
+  <div class="evol-grid">${cards}</div>`;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CARDS PRODUCTO RESUMEN RED
+// ─────────────────────────────────────────────────────────────────────────────
+function prodResumenCards() {
+  let totR={c:0,d:0,p:0}, totM={c:0,d:0,p:0};
+  PUNTOS.forEach(p => {
+    totR.c+=REAL[p].c; totR.d+=REAL[p].d; totR.p+=REAL[p].p;
+    totM.c+=META[p].c; totM.d+=META[p].d; totM.p+=META[p].p;
+  });
+  const prods = [
+    { key:'c', nombre:'Cajita Hechizada', color:'var(--naranja)' },
+    { key:'d', nombre:'Hechizos de Sabor', color:'var(--morado)' },
+    { key:'p', nombre:'Postre Drácula', color:'var(--verde)' }
+  ];
+  return `<div class="sec-titulo">Resultado final por producto — toda la red</div>
+  <div class="prod-resumen-grid">` +
+  prods.map(pr => {
+    const rv = totR[pr.key], mv = totM[pr.key];
+    const pBar = Math.min(rv/mv*100, 100);
+    const dif = rv - mv;
+    const difStr = dif >= 0 ? `+${dif} sobre meta` : `${dif} bajo meta`;
+    const difCol = dif >= 0 ? 'var(--ok-txt)' : 'var(--bad-txt)';
+    return `<div class="prod-resumen-card">
+      <div class="prc-nombre"><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:${pr.color};margin-right:4px;vertical-align:middle"></span>${pr.nombre}</div>
+      <div class="prc-val" style="color:${pr.color}">${rv}</div>
+      <div class="prc-sub">de ${mv} meta · ${pctS(rv,mv)}</div>
+      <div class="prc-barra"><div class="prc-fill" style="width:${Math.min(pBar,100).toFixed(0)}%;background:${pr.color}"></div></div>
+      <div class="prc-dif" style="color:${difCol}">${difStr}</div>
+    </div>`;
+  }).join('') + `</div>`;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// GRÁFICO BARRAS AGRUPADAS POR SEMANA — TODOS LOS PUNTOS
+// ─────────────────────────────────────────────────────────────────────────────
+function graficoSemanas(){
+  const W=580, H=190, pad={t:20,r:10,b:60,l:40};
+  const innerW=W-pad.l-pad.r, innerH=H-pad.t-pad.b;
+  const nSems = SEMANAS.length;
+  const nPuntos = PUNTOS.length;
+  const coloresPunto = ['#2563EB','#D97706','#16A34A','#9333EA','#DC2626'];
+
+  const data = PUNTOS.map(p =>
+    SERIES_SEM[p].map(sem => sem[0]+sem[1]+sem[2])
+  );
+  const allV = data.flat();
+  const maxV = Math.max(...allV, 1);
+
+  const semW = innerW / nSems;
+  const barW = (semW - 8) / nPuntos;
+  const gap = 1;
+
+  let bars='', labels='';
+  SEMANAS.forEach((sem,si) => {
+    const x0 = pad.l + si*semW + 4;
+    PUNTOS.forEach((p,pi) => {
+      const v = data[pi][si] ?? 0;
+      const bh = (v/maxV)*innerH;
+      const bx = x0 + pi*(barW+gap);
+      const by = pad.t + innerH - bh;
+      // S4 más oscuro/opaco
+      const op = si===3 ? '1' : '.7';
+      bars += `<rect x="${bx.toFixed(1)}" y="${by.toFixed(1)}" width="${(barW).toFixed(1)}" height="${bh.toFixed(1)}" rx="2" fill="${coloresPunto[pi]}" opacity="${op}"/>`;
+      if(v>0) bars += `<text x="${(bx+barW/2).toFixed(1)}" y="${(by-2).toFixed(1)}" text-anchor="middle" fill="${coloresPunto[pi]}" font-size="7" font-weight="600">${v}</text>`;
+    });
+    const semLabel = si===3 ? 'S4 ★' : sem;
+    labels += `<text x="${(pad.l+si*semW+semW/2).toFixed(1)}" y="${H-pad.b+14}" text-anchor="middle" fill="${si===3?'#1A1917':'#7A7874'}" font-size="${si===3?'10.5':'10'}" font-weight="${si===3?'700':'400'}">${semLabel}</text>`;
+  });
+
+  let grid='';
+  [.25,.5,.75,1].forEach(f => {
+    const y = pad.t + innerH*(1-f);
+    const v = Math.round(f*maxV);
+    grid += `<line x1="${pad.l}" x2="${W-pad.r}" y1="${y.toFixed(1)}" y2="${y.toFixed(1)}" stroke="#E8E6E3" stroke-width="1"/>`;
+    grid += `<text x="${pad.l-4}" y="${(y+4).toFixed(1)}" text-anchor="end" fill="#7A7874" font-size="9">${v}</text>`;
+  });
+
+  let ley='';
+  PUNTOS.forEach((p,i) => {
+    ley += `<rect x="${pad.l+i*100}" y="${H-pad.b+24}" width="8" height="8" rx="2" fill="${coloresPunto[i]}"/>`;
+    ley += `<text x="${pad.l+i*100+11}" y="${H-pad.b+32}" fill="#7A7874" font-size="9">${p}</text>`;
+  });
+
+  return `<svg class="grafico-svg" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
+    ${grid}
+    <line x1="${pad.l}" x2="${pad.l}" y1="${pad.t}" y2="${pad.t+innerH}" stroke="#E8E6E3"/>
+    <line x1="${pad.l}" x2="${W-pad.r}" y1="${pad.t+innerH}" y2="${pad.t+innerH}" stroke="#E8E6E3"/>
+    ${bars}${labels}${ley}
+  </svg>`;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// GRÁFICO DIARIO (por punto, 33 días)
+// ─────────────────────────────────────────────────────────────────────────────
+function graficoDiario(punto){
+  const ser = DIARIO[punto];
+  const dias = DIARIO.dias;
+  const W=660, H=160, pad={t:16,r:10,b:46,l:32};
+  const innerW=W-pad.l-pad.r, innerH=H-pad.t-pad.b;
+  const N=dias.length;
+  const allV=[...ser.c,...ser.d,...ser.p];
+  const maxV=Math.max(...allV,1);
+  const bW=innerW/N;
+  const subW=(bW-3)/3;
+  const cols=['var(--naranja)','var(--morado)','var(--verde)'];
+
+  let bars='';
+
+  // Separadores de semana
+  [[8,'S2 →'],[15,'S3 →'],[22,'S4 →']].forEach(([idx,lbl]) => {
+    const sepX = pad.l + idx*bW;
+    bars += `<line x1="${sepX.toFixed(1)}" x2="${sepX.toFixed(1)}" y1="${pad.t}" y2="${pad.t+innerH}" stroke="#E8E6E3" stroke-width="1" stroke-dasharray="3,2"/>`;
+    bars += `<text x="${(sepX+2).toFixed(1)}" y="${pad.t+8}" fill="#C8C6C2" font-size="7">${lbl}</text>`;
+  });
+
+  dias.forEach((dia,i) => {
+    const enS4 = i >= 22;
+    [ser.c[i],ser.d[i],ser.p[i]].forEach((v,j) => {
+      if(!v && v!==0) return;
+      const bh=(v/maxV)*innerH;
+      const bx=pad.l+i*bW+1.5+j*(subW+0.5);
+      const by=pad.t+innerH-bh;
+      bars+=`<rect x="${bx.toFixed(1)}" y="${by.toFixed(1)}" width="${subW.toFixed(1)}" height="${bh.toFixed(1)}" rx="1" fill="${cols[j]}" opacity="${enS4?'1':'.55'}"/>`;
+    });
+    const labelY = H-pad.b+11;
+    // Oct 31 / Halloween siempre visible
+    const esHalloween = dia === '31-oct';
+    if(i%4===0 || enS4 || esHalloween) {
+      bars+=`<text x="${(pad.l+i*bW+bW/2).toFixed(1)}" y="${labelY}" text-anchor="middle" fill="${enS4?'#1A1917':'#7A7874'}" font-size="${enS4?'7':'6.5'}" font-weight="${enS4?'600':'400'}">${dia.split('-')[0]}</text>`;
+    }
+    if(esHalloween) bars+=`<text x="${(pad.l+i*bW+bW/2).toFixed(1)}" y="${H-pad.b+22}" text-anchor="middle" fill="#F97316" font-size="7">🎃</text>`;
+    if(DIARIO.festivo[i] && !esHalloween) bars+=`<text x="${(pad.l+i*bW+bW/2).toFixed(1)}" y="${H-pad.b+22}" text-anchor="middle" fill="#F97316" font-size="7">F</text>`;
+    if(DIARIO.marchas[i]) bars+=`<text x="${(pad.l+i*bW+bW/2).toFixed(1)}" y="${H-pad.b+22}" text-anchor="middle" fill="#8B5CF6" font-size="7">M</text>`;
+  });
+
+  let grid='';
+  [.5,1].forEach(f => {
+    const y=pad.t+innerH*(1-f);
+    const v=Math.round(f*maxV);
+    grid+=`<line x1="${pad.l}" x2="${W-pad.r}" y1="${y.toFixed(1)}" y2="${y.toFixed(1)}" stroke="#E8E6E3" stroke-width="1"/>`;
+    grid+=`<text x="${pad.l-3}" y="${(y+4).toFixed(1)}" text-anchor="end" fill="#7A7874" font-size="8">${v}</text>`;
+  });
+
+  const ley = cols.map((c,i) =>
+    `<circle cx="${pad.l+i*72}" cy="${pad.t-5}" r="4" fill="${c}"/>` +
+    `<text x="${pad.l+i*72+8}" y="${pad.t-1}" fill="#7A7874" font-size="9">${['Cajita','Dips','Postre'][i]}</text>`
+  ).join('') +
+  `<text x="${W-pad.r}" y="${pad.t-1}" text-anchor="end" fill="#C8C6C2" font-size="7">S4 más oscuro · 🎃 Halloween</text>`;
+
+  return `<svg class="grafico-diario-svg" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
+    ${grid}
+    <line x1="${pad.l}" x2="${pad.l}" y1="${pad.t}" y2="${pad.t+innerH}" stroke="#E8E6E3"/>
+    <line x1="${pad.l}" x2="${W-pad.r}" y1="${pad.t+innerH}" y2="${pad.t+innerH}" stroke="#E8E6E3"/>
+    ${bars}${ley}
+  </svg>`;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CHIPS TENDENCIA SEMANAL (totales por semana)
+// ─────────────────────────────────────────────────────────────────────────────
+function tendChips(punto){
+  return SERIES_SEM[punto].map((sem,i) => {
+    const tot = sem[0]+sem[1]+sem[2];
+    return `<span class="tend-chip" style="background:${COLORES_SEM[i]}">${SEMANAS[i]}: ${tot}</span>`;
+  }).join('');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// RENDER GENERAL
+// ─────────────────────────────────────────────────────────────────────────────
+function renderGeneral(){
+  let totR={c:0,d:0,p:0}, totM={c:0,d:0,p:0};
+  PUNTOS.forEach(p => {
+    totR.c+=REAL[p].c; totR.d+=REAL[p].d; totR.p+=REAL[p].p;
+    totM.c+=META[p].c; totM.d+=META[p].d; totM.p+=META[p].p;
+  });
+  const totReal=totR.c+totR.d+totR.p;
+  const totMeta=totM.c+totM.d+totM.p;
+
+  const metasLogradas = PUNTOS.reduce((acc,p) => {
+    if(REAL[p].c >= META[p].c) acc++;
+    if(REAL[p].d >= META[p].d) acc++;
+    if(REAL[p].p >= META[p].p) acc++;
+    return acc;
+  }, 0);
+
+  const mejorPunto=PUNTOS.reduce((a,b)=>{
+    const pa=pct(REAL[a].c+REAL[a].d+REAL[a].p,META[a].c+META[a].d+META[a].p);
+    const pb=pct(REAL[b].c+REAL[b].d+REAL[b].p,META[b].c+META[b].d+META[b].p);
+    return pb>pa?b:a;
+  });
+
+  const ingTotal = PUNTOS.reduce((s,p) => s + REAL[p].c*28500 + REAL[p].d*4500 + REAL[p].p*9900, 0);
+
+  const kpis=`
+  <div class="kpi-grid">
+    <div class="kpi-tile">
+      <div class="kpi-label">Total productos vendidos</div>
+      <div class="kpi-val kpi-ok">${fmt(totReal)}</div>
+      <div class="kpi-sub">de ${fmt(totMeta)} meta · ${pctS(totReal,totMeta)}</div>
+    </div>
+    <div class="kpi-tile">
+      <div class="kpi-label">Duración campaña</div>
+      <div class="kpi-val">33 días</div>
+      <div class="kpi-sub">7 oct – 8 nov · Campaña cerrada ✓</div>
+    </div>
+    <div class="kpi-tile">
+      <div class="kpi-label">Metas individuales logradas</div>
+      <div class="kpi-val kpi-ok">${metasLogradas} de 15</div>
+      <div class="kpi-sub">14 superadas · 1 no alcanzada</div>
+    </div>
+    <div class="kpi-tile">
+      <div class="kpi-label">Mejor punto de la campaña</div>
+      <div class="kpi-val">${mejorPunto}</div>
+      <div class="kpi-sub">${pctS(REAL[mejorPunto].c+REAL[mejorPunto].d+REAL[mejorPunto].p,META[mejorPunto].c+META[mejorPunto].d+META[mejorPunto].p)} de meta total</div>
+    </div>
+  </div>`;
+
+  const filas=PUNTOS.map(p=>{
+    const r=REAL[p],m=META[p];
+    const tot=r.c+r.d+r.p, metaTot=m.c+m.d+m.p;
+    const p_=pct(tot,metaTot);
+    const maxProd=Math.max(r.c,r.d,r.p,1);
+    const miniC=Math.round(r.c/maxProd*60), miniD=Math.round(r.d/maxProd*60), miniP=Math.round(r.p/maxProd*60);
+    const alertaCajita = (p==='Unicentro' && r.c < m.c)
+      ? ` <span title="Cajita Hechizada no alcanzó la meta (${r.c}/${m.c})" style="display:inline-block;background:#FEE2E2;color:#B91C1C;border-radius:4px;font-size:10px;font-weight:700;padding:1px 5px;vertical-align:middle;margin-left:4px">⚠ Cajita</span>`
+      : '';
+    return `<tr>
+      <td class="td-punto">${p}${alertaCajita}</td>
+      <td class="td-total">${fmt(tot)}</td>
+      <td class="td-right" style="color:var(--gris3)">${fmt(metaTot)}</td>
+      <td class="td-meta-pct"><span class="badge-pct ${claseBadge(p_)}">${pctS(tot,metaTot)} ${textoEstado(p_)}</span></td>
+      <td class="td-right">
+        <div class="mini-prod-row">
+          <span class="mini-prod-bar" style="width:${miniC}px;background:var(--naranja)"></span>${r.c}
+          <span class="mini-prod-bar" style="width:${miniD}px;background:var(--morado);margin-left:4px"></span>${r.d}
+          <span class="mini-prod-bar" style="width:${miniP}px;background:var(--verde);margin-left:4px"></span>${r.p}
+        </div>
+      </td>
+      <td class="td-right">
+        <div class="tend-chips">${tendChips(p)}</div>
+      </td>
+    </tr>`;
+  }).join('');
+
+  const tabla=`
+  <div class="sec-titulo">Resultado final por punto — campaña completa (7 oct – 8 nov, 33 días)</div>
+  <table class="tabla-res">
+    <thead><tr>
+      <th>Punto</th>
+      <th style="text-align:right">Total real</th>
+      <th style="text-align:right">Meta campaña</th>
+      <th style="text-align:right">% meta</th>
+      <th style="text-align:right">Cajita · Dips · Postre</th>
+      <th style="text-align:right">Tendencia S1→S4</th>
+    </tr></thead>
+    <tbody>${filas}</tbody>
+  </table>`;
+
+  const grafSec=`
+  <div class="sec-titulo">Volumen total por punto y semana</div>
+  <div class="grafico-wrap">${graficoSemanas()}</div>`;
+
+  document.getElementById('contenido').innerHTML = kpis + prodResumenCards() + tabla + grafSec;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// RENDER PUNTO
+// ─────────────────────────────────────────────────────────────────────────────
+function renderPunto(punto){
+  const r=REAL[punto], m=META[punto], info=INFO[punto];
+  const pc={c:pctS(r.c,m.c), d:pctS(r.d,m.d), p:pctS(r.p,m.p)};
+  const ingReal=r.c*28500+r.d*4500+r.p*9900;
+  const ingMeta=m.c*28500+m.d*4500+m.p*9900;
+
+  const alertaUnicentro = (punto==='Unicentro' && r.c < m.c)
+    ? `<div style="background:#FEE2E2;border:1px solid #FECACA;border-radius:var(--radio);padding:.6rem .85rem;margin-bottom:.85rem;font-size:12px;color:#B91C1C;display:flex;align-items:center;gap:.5rem">
+        <span style="font-size:16px">⚠️</span>
+        <div><strong>Única meta no alcanzada de la campaña:</strong> Cajita Hechizada — ${r.c} vendidas de ${m.c} en meta (${pctS(r.c,m.c)}). Los demás productos y puntos cumplieron o superaron su meta.</div>
+       </div>`
+    : '';
+
+  const tiles=`
+  ${alertaUnicentro}
+  <div class="prod-kpi-row">
+    <div class="prod-tile" style="${punto==='Unicentro' && r.c < m.c ? 'border-color:#FECACA;background:#FFF5F5' : ''}">
+      <div class="pt-prod">Cajita Hechizada · $28.500</div>
+      <div class="pt-val" style="color:var(--naranja)">${fmt(r.c)}</div>
+      <div class="pt-sub">de ${fmt(m.c)} meta · ${pc.c}${punto==='Unicentro' && r.c < m.c ? ' <span style="color:#B91C1C;font-weight:700">⚠ No alcanzada</span>' : ''}</div>
+      <div class="pt-barra"><div class="pt-fill" style="width:${Math.min(pct(r.c,m.c),100)}%;background:var(--naranja)"></div></div>
+    </div>
+    <div class="prod-tile">
+      <div class="pt-prod">Hechizos de Sabor · $4.500</div>
+      <div class="pt-val" style="color:var(--morado)">${fmt(r.d)}</div>
+      <div class="pt-sub">de ${fmt(m.d)} meta · ${pc.d}</div>
+      <div class="pt-barra"><div class="pt-fill" style="width:${Math.min(pct(r.d,m.d),100)}%;background:var(--morado)"></div></div>
+    </div>
+    <div class="prod-tile">
+      <div class="pt-prod">Postre Drácula · $9.900</div>
+      <div class="pt-val" style="color:var(--verde)">${fmt(r.p)}</div>
+      <div class="pt-sub">de ${fmt(m.p)} meta · ${pc.p}</div>
+      <div class="pt-barra"><div class="pt-fill" style="width:${Math.min(pct(r.p,m.p),100)}%;background:var(--verde)"></div></div>
+    </div>
+  </div>`;
+
+  const kpiIng=`
+  <div class="kpi-grid" style="grid-template-columns:1fr 1fr;margin-bottom:1rem">
+    <div class="kpi-tile">
+      <div class="kpi-label">Ingreso real campaña completa</div>
+      <div class="kpi-val kpi-ok" style="font-size:18px">${fmtCOP(ingReal)}</div>
+    </div>
+    <div class="kpi-tile">
+      <div class="kpi-label">Meta de ingreso campaña</div>
+      <div class="kpi-val" style="font-size:18px;color:var(--gris3)">${fmtCOP(ingMeta)}</div>
+      <div class="kpi-sub">${ingReal>=ingMeta ? '✓ Meta superada en '+fmtCOP(ingReal-ingMeta) : 'Diferencia: '+fmtCOP(ingReal-ingMeta)}</div>
+    </div>
+  </div>`;
+
+  const evolSec = evolucionSemanal(punto);
+
+  const grafDia=`
+  <div class="sec-titulo">Ventas diarias — 33 días de campaña (S4 destacado · 🎃 Halloween)</div>
+  <div class="grafico-wrap" style="margin-bottom:1rem">${graficoDiario(punto)}</div>`;
+
+  const tendSec=`
+  <div class="sec-titulo" style="margin-bottom:.4rem">Volumen total por semana</div>
+  <div class="tend-chips" style="margin-bottom:1rem">${tendChips(punto)}</div>`;
+
+  document.getElementById('contenido').innerHTML = `
+    <div class="punto-header">
+      <span class="punto-nombre">${punto}</span>
+      <span class="punto-director">— ${info.director}</span>
+    </div>
+    ${tiles}
+    ${evolSec}
+    ${kpiIng}
+    ${grafDia}
+    ${tendSec}`;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// NAV
+// ─────────────────────────────────────────────────────────────────────────────
+let tabActual = 'general';
+function setTab(tab, btn){
+  tabActual = tab;
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('activo'));
+  btn.classList.add('activo');
+  if(tab==='general') renderGeneral();
+  else renderPunto(tab);
+}
+
+renderGeneral();
+</script>
+</body>
+</html>
